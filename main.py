@@ -1,4 +1,5 @@
 import pygame, time, random
+from pygame.locals import *
 
 #initialise pygame
 pygame.init()
@@ -32,8 +33,8 @@ def text_objects(text,font):
     textSurface = font.render(text, True, black)
     return textSurface, textSurface.get_rect()
 
-def button(x, y, xi, yi, text, font, colour):
 
+def button(x, y, xi, yi, text, font, colour):
     btnSurf, btnRect = text_objects(text, font)
     btnRect.center = (xi,y+yi/2)
     pygame.draw.rect(gameDisplay, colour, [x, y,xi, yi])
@@ -75,8 +76,7 @@ def game_intro():
 
 
 def play_game():
-    gameDisplay.fill(white)
-    pygame.draw.rect(gameDisplay, black, [0, 0, display_width, display_height], 1)
+    
 
     xposes = display_width/squaresize
     yposes = display_height/squaresize
@@ -89,7 +89,8 @@ def play_game():
     global food_location
     food_location = [0,0]
     snakesquares = []
-    score = 344
+    score = 0
+    direction = 'none'
 
     for num in range(length):
         snakesquares.append([centrepos[0], centrepos[0]-num])
@@ -102,22 +103,48 @@ def play_game():
             if x == snakesquare[0] and y ==snakesquare[1]:
                 new_food(snakesquares)
         
-        pygame.draw.rect(gameDisplay, red, [x*20, y*20, 20, 20])
         food_location = [x,y]
-        print(food_location)
 
     new_food(snakesquares)
 
 
     while not gameExit:
+        gameDisplay.fill(white)
+        pygame.draw.rect(gameDisplay, black, [0, 0, display_width, display_height], 1)
+        pygame.draw.rect(gameDisplay, red, [food_location[0]*20, food_location[1]*20, 20, 20])
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                quit()
-        
-        for snakesquare in snakesquares:
-            pygame.draw.rect(gameDisplay, green, [snakesquare[0]*20, snakesquare[1]*20,20, 20])
 
+            elif event.type == pygame.KEYDOWN:
+                if event.key == K_UP:
+                    direction = 'up'
+                elif event.key == K_DOWN:
+                    direction = 'down'
+                elif event.key == K_LEFT:
+                    direction = 'left'
+                elif event.key == K_RIGHT:
+                    direction = 'right'
+        
+        
+
+        if direction == 'up':
+            newpiece = [snakesquares[0][0], (snakesquares[0][1])-1]
+            print(newpiece)
+            if snakesquares[1] != [newpiece]:
+                del snakesquares[-1]
+                snakesquares = [newpiece] + snakesquares
+            else:
+                print('none up')
+
+        elif direction == 'down':
+            newpiece = [snakesquares[0][0], (snakesquares[0][1])+1]
+            print(newpiece)
+            if snakesquares[1] != [newpiece]:
+                del snakesquares[-1]
+                snakesquares = [newpiece] + snakesquares
+            print('nope')
 
 
         scoreSurf, scoreRect = text_objects(str(score), smallfont)
