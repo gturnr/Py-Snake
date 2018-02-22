@@ -102,10 +102,36 @@ def play_game():
         for snakesquare in snakesquares:
             if x == snakesquare[0] and y ==snakesquare[1]:
                 new_food(snakesquares)
-        
+        global food_location
         food_location = [x,y]
 
     new_food(snakesquares)
+
+    class Snake(object):
+        def __init__(self):
+            self.x = centrepos[0]
+            self.y = centrepos[1]
+            self.speed = 1
+            self.maxspeed = 4
+            self.direction = 'up'
+            self.length = 4
+            self.positions = []
+            for point in range(self.length):
+                self.positions.append([])
+
+        def move(self):
+            if self.direction == 'up':
+                print('up')
+
+
+        def draw(self, surface):
+            for point in self.positions:
+                pygame.draw.rect(surface, green, [point[0] * 20, point[1] * 20, 20, 20])
+
+
+
+
+
 
 
     while not gameExit:
@@ -131,9 +157,10 @@ def play_game():
 
         if direction == 'up':
             newpiece = [snakesquares[0][0], (snakesquares[0][1])-1]
-            print(newpiece)
+            print('new ' + str(newpiece))
+            print('previous ' + str(snakesquares[1]))
             if snakesquares[1] != [newpiece]:
-                del snakesquares[-1]
+                snakesquares = snakesquares[:-1]
                 snakesquares = [newpiece] + snakesquares
             else:
                 print('none up')
@@ -142,9 +169,31 @@ def play_game():
             newpiece = [snakesquares[0][0], (snakesquares[0][1])+1]
             print(newpiece)
             if snakesquares[1] != [newpiece]:
-                del snakesquares[-1]
+                snakesquares = snakesquares[:-1]
                 snakesquares = [newpiece] + snakesquares
-            print('nope')
+            else:
+                print('nope')
+
+        elif direction == 'right':
+            newpiece = [snakesquares[0][0]+1, (snakesquares[0][1])]
+            print(newpiece)
+            if snakesquares[1] != [newpiece]:
+                snakesquares = snakesquares[:-1]
+                snakesquares = [newpiece] + snakesquares
+            else:
+                print('nope')
+
+        elif direction == 'left':
+            newpiece = [snakesquares[0][0]-1, (snakesquares[0][1])]
+            print(newpiece)
+            if snakesquares[1] != [newpiece]:
+                snakesquares = snakesquares[:-1]
+                snakesquares = [newpiece] + snakesquares
+            else:
+                print('nope')
+
+        for snakesquare in snakesquares:
+            pygame.draw.rect(gameDisplay, green, [snakesquare[0]*20, snakesquare[1]*20, 20, 20])
 
 
         scoreSurf, scoreRect = text_objects(str(score), smallfont)
@@ -152,7 +201,7 @@ def play_game():
         gameDisplay.blit(scoreSurf, scoreRect)
             
         pygame.display.update()
-        clock.tick(1)
+        clock.tick(5)
     
 
 game_intro()
