@@ -203,6 +203,20 @@ def text_objects(text,font):
     textSurface = font.render(text, True, black)
     return textSurface, textSurface.get_rect()
 
+class Text(object):
+    def __init__(self, x, y, text, font, colour):
+        self.x = x
+        self.y = y
+        self.font = font
+        self.colour = colour
+        
+        self.TextSurf = self.font.render(text, True, colour)
+        self.TextRect = self.TextSurf.get_rect()
+        self.TextRect.center = (self.x, self.y)
+
+    def draw(self, surface):
+        surface.blit(self.TextSurf, self.TextRect)
+
 
 class Button(object):
     def __init__(self, x, y, xi, yi, text, font, bgcolour):
@@ -228,23 +242,6 @@ class Button(object):
         if (self.x + self.width) > mouse[0] > self.x and (self.y + self.height) > mouse[1] > self.y:
             if click[0] == 1:
                 return True
-
-
-
-
-#button generator function
-def button(x, y, xi, yi, text, font, colour):
-    btnSurf, btnRect = text_objects(text, font)
-    btnRect.center = (xi,y+yi/2)
-    pygame.draw.rect(gameDisplay, colour, [x, y,xi, yi])
-    gameDisplay.blit(btnSurf, btnRect)
-
-    mouse = pygame.mouse.get_pos()
-    click = pygame.mouse.get_pressed()
-
-    if (x+xi) > mouse[0] > x and (y+yi) > mouse[1] > y:
-        if click[0] == 1:
-            return(1)
 
 
 #game menu
@@ -319,9 +316,10 @@ def play_game():
         scoreRect.bottomright = (display_width-10,display_height-5)
         gameDisplay.blit(scoreSurf, scoreRect)
 
+        #display fps counter
         if DISPLAY_FPS:
             fpsSurf, fpsRect = text_objects('fps ' + str(round(1/dt)), smallfont)
-            fpsRect.topleft = (10, 10)
+            fpsRect.topleft = (5, 5)
             gameDisplay.blit(fpsSurf, fpsRect)
    
         pygame.draw.rect(gameDisplay, black, [0, 0, display_width, display_height], 1) #draws an outline around the play area
@@ -333,23 +331,20 @@ def play_game():
 def lost(score):
     lost = True
     gameDisplay.fill(white)
-
+    #retry button
     button = Button(150, 400, 300, 100, 'Try again', font, red)
     button.draw(gameDisplay)
-
     # Lost text
     TextSurf, TextRect = text_objects("You lost!", font)
     TextRect.center = ((display_width / 2), ((display_height / 3)))
     gameDisplay.blit(TextSurf, TextRect)
-
     # score text
     TextSurf, TextRect = text_objects("Score: " + str(score), smallfont)
     TextRect.center = ((display_width / 2), ((display_height / 2.3)))
     gameDisplay.blit(TextSurf, TextRect)
     
     while lost:
-        dt = clock.tick(FPS) / 1000.0
-        print(1/dt)
+        clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
