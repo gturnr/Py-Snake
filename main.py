@@ -10,7 +10,7 @@ SPEED_INCREMENT = 0.5
 INITIAL_LENGTH = 5
 SCORE_INCREMENT = 100
 
-PASS_EDGES = True
+PASS_EDGES = False
 
 display_width = 600
 display_height = 800
@@ -234,6 +234,7 @@ def text_objects(text,font):
     textSurface = font.render(text, True, black)
     return textSurface, textSurface.get_rect()
 
+####NOT IN USE YET
 class Text(object):
     def __init__(self, x, y, text, font, colour):
         self.x = x
@@ -265,10 +266,14 @@ class Button(object):
         self.bgcolour = bgcolour
         #self.btnSurf, self.btnRect = text_objects(self.text, self.font)
 
-        self.btnSurf = self.font.render(self.text, True, black)
+
+        btnText = Text(self.width, self.y + self.height / 2, self.text, self.font, black)
+        self.btnSurf = btnText.TextSurf
+        self.btnRect = btnText.TextRect
+        '''self.btnSurf = self.font.render(self.text, True, black)
         self.btnRect = self.btnSurf.get_rect()
 
-        self.btnRect.center = (self.width, self.y + self.height / 2)
+        self.btnRect.center = (self.width, self.y + self.height / 2)'''
 
     def draw(self, surface):
         pygame.draw.rect(surface, self.bgcolour, [self.x, self.y, self.width, self.height])
