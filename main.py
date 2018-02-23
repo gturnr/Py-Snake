@@ -242,17 +242,17 @@ class Text(object):
         self.font = font
         self.colour = colour
 
-        self.TextSurf = self.font.render(str(text), True, self.colour)
-        self.TextRect = self.TextSurf.get_rect()
-        self.TextRect.center = (self.x, self.y)
+        self.surf = self.font.render(str(text), True, self.colour)
+        self.rect = self.surf.get_rect()
+        self.rect.center = (self.x, self.y)
 
     def update(self, text):
-        self.TextSurf = self.font.render(str(text), True, self.colour)
-        self.TextRect = self.TextSurf.get_rect()
-        self.TextRect.center = (self.x, self.y)
+        self.surf = self.font.render(str(text), True, self.colour)
+        self.rect = self.surf.get_rect()
+        self.rect.center = (self.x, self.y)
 
     def draw(self, surface):
-        surface.blit(self.TextSurf, self.TextRect)
+        surface.blit(self.surf, self.rect)
 
 
 class Button(object):
@@ -264,20 +264,13 @@ class Button(object):
         self.text = str(text)
         self.font = font
         self.bgcolour = bgcolour
-        #self.btnSurf, self.btnRect = text_objects(self.text, self.font)
 
-
-        btnText = Text(self.width, self.y + self.height / 2, self.text, self.font, black)
-        self.btnSurf = btnText.TextSurf
-        self.btnRect = btnText.TextRect
-        '''self.btnSurf = self.font.render(self.text, True, black)
-        self.btnRect = self.btnSurf.get_rect()
-
-        self.btnRect.center = (self.width, self.y + self.height / 2)'''
+        #uses the Text class to render out the btnText and position
+        self.btn = Text(self.width, self.y + self.height / 2, self.text, self.font, black)
 
     def draw(self, surface):
         pygame.draw.rect(surface, self.bgcolour, [self.x, self.y, self.width, self.height])
-        surface.blit(self.btnSurf, self.btnRect)
+        surface.blit(self.btn.surf, self.btn.rect)
 
     def detect(self):
         mouse = pygame.mouse.get_pos()
@@ -298,9 +291,9 @@ def game_intro():
     button.draw(gameDisplay)
 
     # Snake text
-    TextSurf, TextRect = text_objects("Snake", largefont)
-    TextRect.center = ((display_width / 2), ((display_height / 3)))
-    gameDisplay.blit(TextSurf, TextRect)
+    title = Text((display_width / 2), (display_height / 3), 'Snake', largefont, black)
+    title.draw(gameDisplay)
+
     
     while intro:
         for event in pygame.event.get():
@@ -317,10 +310,8 @@ def game_intro():
     play_game()
 
 def play_game():
-    #creates a new snake object
-    snake = Snake()
-    #creates a new food object
-    food = Food(snake)
+    snake = Snake() #creates a new snake object
+    food = Food(snake) #creates a new food object
     #variables
     lostGame = False
     global score
@@ -356,6 +347,7 @@ def play_game():
         food.draw(gameDisplay) #draws the food piece to the display
 
         #render the score to the screen
+
         scoreSurf, scoreRect = text_objects(str(score), smallfont)
         scoreRect.bottomright = (display_width-10,display_height-5)
         gameDisplay.blit(scoreSurf, scoreRect)
@@ -378,14 +370,14 @@ def lost(score):
     #retry button
     button = Button(150, 400, 300, 100, 'Try again', font, red)
     button.draw(gameDisplay)
+
     # Lost text
-    TextSurf, TextRect = text_objects("You lost!", font)
-    TextRect.center = ((display_width / 2), ((display_height / 3)))
-    gameDisplay.blit(TextSurf, TextRect)
+    lost = Text((display_width / 2), (display_height / 3), 'You lost!', font, black)
+    lost.draw(gameDisplay)
+
     # score text
-    TextSurf, TextRect = text_objects("Score: " + str(score), smallfont)
-    TextRect.center = ((display_width / 2), ((display_height / 2.3)))
-    gameDisplay.blit(TextSurf, TextRect)
+    score = Text((display_width / 2), (display_height / 2.3), "Score: " + str(score), smallfont, black)
+    score.draw(gameDisplay)
     
     while lost:
         clock.tick(FPS)
