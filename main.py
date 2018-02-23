@@ -10,6 +10,8 @@ SPEED_INCREMENT = 0.5
 INITIAL_LENGTH = 5
 SCORE_INCREMENT = 100
 
+PASS_EDGES = True
+
 display_width = 600
 display_height = 800
 
@@ -82,8 +84,15 @@ class Snake(object):
                 self.y = self.positions[0][1]
                 self.timer = 1/self.speed
 
-        def up(self): 
-            newpiece = [self.positions[0][0], (self.positions[0][1])-1]
+        def up(self):
+            if PASS_EDGES:
+                if self.positions[0][1] == 0:
+                    newpiece = [self.positions[0][0], yposes-1]
+                else:
+                    newpiece = [self.positions[0][0], (self.positions[0][1])-1]
+            else:
+                newpiece = [self.positions[0][0], (self.positions[0][1])-1]
+
             if self.positions[1][1] != newpiece[1]:
                 self.positions = self.positions[:-1]
                 self.positions = [newpiece] + self.positions
@@ -92,7 +101,14 @@ class Snake(object):
                 self.down()
 
         def down(self):
-            newpiece = [self.positions[0][0], (self.positions[0][1])+1]
+            if PASS_EDGES:
+                if self.positions[0][1] == yposes-1:
+                    newpiece = [self.positions[0][0], 0]
+                else:
+                    newpiece = [self.positions[0][0], (self.positions[0][1])+1]
+            else:
+                newpiece = [self.positions[0][0], (self.positions[0][1])+1]
+
             if self.positions[1][1] != newpiece[1]:
                 self.positions = self.positions[:-1]
                 self.positions = [newpiece] + self.positions
@@ -101,16 +117,30 @@ class Snake(object):
                 self.up()
 
         def right(self):
-            newpiece = [(self.positions[0][0])+1, self.positions[0][1]]
+            if PASS_EDGES:
+                if self.positions[0][0] == xposes-1:
+                    newpiece = [0, self.positions[0][1]]
+                else:
+                    newpiece = [(self.positions[0][0])+1, self.positions[0][1]]
+            else:
+                newpiece = [(self.positions[0][0]) + 1, self.positions[0][1]]
+
             if self.positions[1][0] != newpiece[0]:
                 self.positions = self.positions[:-1]
                 self.positions = [newpiece] + self.positions
             else:
                 self.direction = 'left'
-                self.left
+                self.left()
 
         def left(self):
-            newpiece = [(self.positions[0][0])-1, self.positions[0][1]]
+            if PASS_EDGES:
+                if self.positions[0][0] == 0:
+                    newpiece = [xposes-1, self.positions[0][1]]
+                else:
+                    newpiece = [(self.positions[0][0])-1, self.positions[0][1]]
+            else:
+                newpiece = [(self.positions[0][0]) - 1, self.positions[0][1]]
+
             if self.positions[1][0] != newpiece[0]:
                 self.positions = self.positions[:-1]
                 self.positions = [newpiece] + self.positions
@@ -158,9 +188,10 @@ class Snake(object):
                 self.grow()
 
 
-            #check is snake is within the screen 
-            if self.x*squaresize < 0 or (self.x*squaresize)+squaresize > display_width or self.y*squaresize < 0 or (self.y*squaresize)+squaresize > display_height:
-                return True
+            #check is snake is within the screen
+            if not PASS_EDGES:
+                if self.x*squaresize < 0 or (self.x*squaresize)+squaresize > display_width or self.y*squaresize < 0 or (self.y*squaresize)+squaresize > display_height:
+                    return True
                
             #checks if the head is crossing any other parts of the snake body
             positions = iter(self.positions)
@@ -209,8 +240,13 @@ class Text(object):
         self.y = y
         self.font = font
         self.colour = colour
-        
-        self.TextSurf = self.font.render(text, True, colour)
+
+        self.TextSurf = self.font.render(str(text), True, self.colour)
+        self.TextRect = self.TextSurf.get_rect()
+        self.TextRect.center = (self.x, self.y)
+
+    def update(self, text):
+        self.TextSurf = self.font.render(str(text), True, self.colour)
         self.TextRect = self.TextSurf.get_rect()
         self.TextRect.center = (self.x, self.y)
 
@@ -224,11 +260,14 @@ class Button(object):
         self.y = y
         self.width = xi
         self.height = yi
-        self.text = text
+        self.text = str(text)
         self.font = font
-        # self.textcolour = textcolour
         self.bgcolour = bgcolour
-        self.btnSurf, self.btnRect = text_objects(self.text, self.font)
+        #self.btnSurf, self.btnRect = text_objects(self.text, self.font)
+
+        self.btnSurf = self.font.render(self.text, True, black)
+        self.btnRect = self.btnSurf.get_rect()
+
         self.btnRect.center = (self.width, self.y + self.height / 2)
 
     def draw(self, surface):
