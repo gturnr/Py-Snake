@@ -4,9 +4,10 @@ from pygame.locals import *
 ### USER VARIABLES ###
 
 FPS = 60
-INITIAL_SPEED = 9
+DISPLAY_FPS = True
+INITIAL_SPEED = 15
 SPEED_INCREMENT = 0.5
-INITIAL_LENGTH = 10
+INITIAL_LENGTH = 5
 SCORE_INCREMENT = 100
 
 display_width = 600
@@ -202,6 +203,35 @@ def text_objects(text,font):
     textSurface = font.render(text, True, black)
     return textSurface, textSurface.get_rect()
 
+
+class Button(object):
+    def __init__(self, x, y, xi, yi, text, font, bgcolour):
+        self.x = x
+        self.y = y
+        self.width = xi
+        self.height = yi
+        self.text = text
+        self.font = font
+        # self.textcolour = textcolour
+        self.bgcolour = bgcolour
+        self.btnSurf, self.btnRect = text_objects(self.text, self.font)
+        self.btnRect.center = (self.width, self.y + self.height / 2)
+
+    def draw(self, surface):
+        pygame.draw.rect(surface, self.bgcolour, [self.x, self.y, self.width, self.height])
+        surface.blit(self.btnSurf, self.btnRect)
+
+    def detect(self):
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+        if (self.x + self.width) > mouse[0] > self.x and (self.y + self.height) > mouse[1] > self.y:
+            if click[0] == 1:
+                return True
+
+
+
+
 #button generator function
 def button(x, y, xi, yi, text, font, colour):
     btnSurf, btnRect = text_objects(text, font)
@@ -222,6 +252,14 @@ def game_intro():
     global intro
     intro = True
     gameDisplay.fill(white) #White bg
+
+    button = Button(150, 400, 300, 100, 'Play', font, green)
+    button.draw(gameDisplay)
+
+    # Snake text
+    TextSurf, TextRect = text_objects("Snake", largefont)
+    TextRect.center = ((display_width / 2), ((display_height / 3)))
+    gameDisplay.blit(TextSurf, TextRect)
     
     while intro:
         for event in pygame.event.get():
@@ -229,13 +267,7 @@ def game_intro():
                 pygame.quit()
                 quit()
 
-        #Snake text
-        TextSurf, TextRect = text_objects("Snake", largefont)
-        TextRect.center = ((display_width/2),((display_height/3)))
-        gameDisplay.blit(TextSurf, TextRect)
-
-        #start button
-        if button(150, 400, 300, 100, 'Play', font, green) == 1:
+        if button.detect():
             intro = False
 
         pygame.display.update()
@@ -286,6 +318,11 @@ def play_game():
         scoreSurf, scoreRect = text_objects(str(score), smallfont)
         scoreRect.bottomright = (display_width-10,display_height-5)
         gameDisplay.blit(scoreSurf, scoreRect)
+
+        if DISPLAY_FPS:
+            fpsSurf, fpsRect = text_objects('fps ' + str(round(1/dt)), smallfont)
+            fpsRect.topleft = (10, 10)
+            gameDisplay.blit(fpsSurf, fpsRect)
    
         pygame.draw.rect(gameDisplay, black, [0, 0, display_width, display_height], 1) #draws an outline around the play area
         pygame.display.update()
@@ -296,29 +333,33 @@ def play_game():
 def lost(score):
     lost = True
     gameDisplay.fill(white)
+
+    button = Button(150, 400, 300, 100, 'Try again', font, red)
+    button.draw(gameDisplay)
+
+    # Lost text
+    TextSurf, TextRect = text_objects("You lost!", font)
+    TextRect.center = ((display_width / 2), ((display_height / 3)))
+    gameDisplay.blit(TextSurf, TextRect)
+
+    # score text
+    TextSurf, TextRect = text_objects("Score: " + str(score), smallfont)
+    TextRect.center = ((display_width / 2), ((display_height / 2.3)))
+    gameDisplay.blit(TextSurf, TextRect)
     
     while lost:
+        dt = clock.tick(FPS) / 1000.0
+        print(1/dt)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
 
-        #Lost text
-        TextSurf, TextRect = text_objects("You lost!", font)
-        TextRect.center = ((display_width/2),((display_height/3)))
-        gameDisplay.blit(TextSurf, TextRect)
-
-        #score text
-        TextSurf, TextRect = text_objects("Score: " + str(score), smallfont)
-        TextRect.center = ((display_width/2),((display_height/2.3)))
-        gameDisplay.blit(TextSurf, TextRect)
-
         #retry button
-        if button(150, 400, 300, 100, 'Try again', font, red) == 1:
+        if button.detect():
             lost = False
 
         pygame.display.update()
-        clock.tick(FPS)
 
     play_game()
 
