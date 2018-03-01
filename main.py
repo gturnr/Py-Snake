@@ -4,13 +4,13 @@ from pygame.locals import *
 ### USER VARIABLES ###
 
 FPS = 60
-DISPLAY_FPS = True
+DISPLAY_FPS = False
 INITIAL_SPEED = 15
 SPEED_INCREMENT = 0.5
 INITIAL_LENGTH = 5
 SCORE_INCREMENT = 100
 
-PASS_EDGES = False
+PASS_EDGES = True
 
 display_width = 600
 display_height = 800
@@ -228,13 +228,6 @@ class Food(object):
             else:
                 self.new(snake)
         
-
-#text generator function
-def text_objects(text,font):
-    textSurface = font.render(text, True, black)
-    return textSurface, textSurface.get_rect()
-
-####NOT IN USE YET
 class Text(object):
     def __init__(self, x, y, text, font, colour):
         self.x = x
@@ -347,16 +340,15 @@ def play_game():
         food.draw(gameDisplay) #draws the food piece to the display
 
         #render the score to the screen
-
-        scoreSurf, scoreRect = text_objects(str(score), smallfont)
-        scoreRect.bottomright = (display_width-10,display_height-5)
-        gameDisplay.blit(scoreSurf, scoreRect)
+        score_text = Text(0, 0, score, smallfont, black)
+        score_text.rect.bottomright = (display_width-10,display_height-5)
+        score_text.draw(gameDisplay)
 
         #display fps counter
         if DISPLAY_FPS:
-            fpsSurf, fpsRect = text_objects('fps ' + str(round(1/dt)), smallfont)
-            fpsRect.topleft = (5, 5)
-            gameDisplay.blit(fpsSurf, fpsRect)
+            fps_text = Text(0, 0, 'fps ' + str(round(1/dt)), smallfont, black)
+            fps_text.rect.topleft = (5, 5)
+            fps_text.draw(gameDisplay)
    
         pygame.draw.rect(gameDisplay, black, [0, 0, display_width, display_height], 1) #draws an outline around the play area
         pygame.display.update()
