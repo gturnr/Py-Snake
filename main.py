@@ -10,7 +10,7 @@ SPEED_INCREMENT = 0.5
 INITIAL_LENGTH = 5
 SCORE_INCREMENT = 100
 
-PASS_EDGES = False
+PASS_EDGES = True
 
 display_width = 600
 display_height = 800
